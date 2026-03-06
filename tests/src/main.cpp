@@ -18,8 +18,11 @@
 
 extern "C" {
 
-void setUp(void) {}
-void tearDown(void) {}
+void setUp(void)
+{}
+
+void tearDown(void)
+{}
 
 } /* extern "C" */
 

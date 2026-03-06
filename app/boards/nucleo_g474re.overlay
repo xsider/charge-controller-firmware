@@ -1,10 +1,8 @@
 /*
- * Copyright (c) 2019 STMicroelectronics.
+ * Copyright (c) The Libre Solar Project Contributors
  *
  * SPDX-License-Identifier: Apache-2.0
- */
-
-/*
+ *
  * This is a dummy charge controller board for testing new features using the STM32G474 MCU
  *
  * IMPORTANT: You have to remove the VREF jumper on the Nucleo board to make it work. Otherwise

@@ -17,14 +17,19 @@ manifest:
           - cmsis_6
           - edtt
           - hal_stm32
+          - zcbor
     - name: oled-display-library
       remote: libresolar
       revision: 523b26c103de56714fcda655702d600870a671bc
       path: modules/oled-display
-    - name: thingset-device-library
+    - name: thingset-zephyr-sdk
       remote: thingset
-      revision: 9630a357de071ac63bfbbaf9d91c6c937663601f
-      path: modules/thingset
+      revision: 5d5c6b031ba543d67a3dc6904ccfc987ebdadc52
+      path: thingset-zephyr-sdk
+      import:
+        name-allowlist:
+          - thingset-node-c
+          - zcbor
     - name: unity
       remote: throwtheswitch
       revision: 74cde089e65c3435ce9aa87d5c69f4f16b7f6ade

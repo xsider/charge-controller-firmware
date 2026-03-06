@@ -4,14 +4,13 @@ zephyr_include_directories(.)
 
 target_sources(app PRIVATE
         bat_charger.cpp
-        data_objects.cpp
-        data_storage.cpp
         daq.cpp
         daq_driver.c
         device_status.cpp
         dcdc.cpp
         half_bridge.c
         hardware.cpp
+        oled.cpp
         leds.cpp
         load.cpp
         load_driver.c
@@ -22,14 +21,14 @@ target_sources(app PRIVATE
         setup.cpp
 )
 
-add_subdirectory(ext)
-
 if(${CONFIG_CUSTOM_DATA_OBJECTS_FILE})
-        target_sources(app PRIVATE data_objects_custom.cpp)
+    target_sources(app PRIVATE data_objects_custom.cpp)
+else()
+    target_sources(app PRIVATE data_objects.cpp)
 endif()
 
 # Using this option enables user-specific customization of the firmware. The
 # custom subfolder should have its own CMakeLists.txt file.
 if(${CONFIG_CUSTOMIZATION})
-        add_subdirectory(custom build/custom)
+    add_subdirectory(custom build/custom)
 endif()
