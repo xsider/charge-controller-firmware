@@ -136,7 +136,7 @@ void no_start_if_dcdc_disabled()
 void no_start_if_dcdc_lv_voltage_low()
 {
     init_structs_buck();
-    lv_terminal.bus->voltage = dcdc.ls_voltage_min - 0.5;
+    lv_terminal.bus->voltage = dcdc.ls_voltage_min - 0.5f;
     TEST_ASSERT_EQUAL(DCDC_MODE_OFF, dcdc.check_start_conditions());
 }
 
@@ -145,7 +145,7 @@ void no_start_if_dcdc_lv_voltage_low()
 void no_buck_start_if_bat_voltage_high()
 {
     init_structs_buck();
-    lv_terminal.bus->voltage = bat_conf.topping_voltage + 0.1;
+    lv_terminal.bus->voltage = bat_conf.topping_voltage + 0.1f;
     TEST_ASSERT_EQUAL(DCDC_MODE_OFF, dcdc.check_start_conditions());
 }
 
@@ -175,7 +175,7 @@ void no_buck_start_if_solar_voltage_low()
 void no_boost_start_if_bat_voltage_high()
 {
     init_structs_boost();
-    hv_terminal.bus->voltage = bat_conf.topping_voltage + 0.1;
+    hv_terminal.bus->voltage = bat_conf.topping_voltage + 0.1f;
     TEST_ASSERT_EQUAL(DCDC_MODE_OFF, dcdc.check_start_conditions());
 }
 
@@ -215,7 +215,7 @@ void buck_derating_output_voltage_too_high()
 {
     start_buck();
     float pwm_before = half_bridge_get_duty_cycle();
-    lv_terminal.bus->voltage = lv_terminal.bus->sink_voltage_intercept + 0.1;
+    lv_terminal.bus->voltage = lv_terminal.bus->sink_voltage_intercept + 0.1f;
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
     TEST_ASSERT(pwm_after < pwm_before); // less duty cycle = higher voltage
@@ -226,7 +226,7 @@ void buck_derating_output_current_too_high()
 {
     start_buck();
     float pwm_before = half_bridge_get_duty_cycle();
-    lv_terminal.current = lv_terminal.pos_current_limit + 0.1;
+    lv_terminal.current = lv_terminal.pos_current_limit + 0.1f;
     lv_terminal.update_bus_current_margins();
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
@@ -238,7 +238,7 @@ void buck_derating_inductor_current_too_high()
 {
     start_buck();
     float pwm_before = half_bridge_get_duty_cycle();
-    dcdc.inductor_current = dcdc.inductor_current_max + 0.1;
+    dcdc.inductor_current = dcdc.inductor_current_max + 0.1f;
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
     TEST_ASSERT(pwm_after < pwm_before);
@@ -249,8 +249,8 @@ void buck_derating_input_voltage_too_low()
 {
     start_buck();
     float pwm_before = half_bridge_get_duty_cycle();
-    hv_terminal.bus->voltage = hv_terminal.bus->src_voltage_intercept - 0.1;
-    dcdc.power = 1.2;
+    hv_terminal.bus->voltage = hv_terminal.bus->src_voltage_intercept - 0.1f;
+    dcdc.power = 1.2f;
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
     TEST_ASSERT(pwm_after < pwm_before);
@@ -261,7 +261,7 @@ void buck_derating_input_current_too_high()
 {
     start_buck();
     float pwm_before = half_bridge_get_duty_cycle();
-    hv_terminal.current = hv_terminal.neg_current_limit - 0.1;
+    hv_terminal.current = hv_terminal.neg_current_limit - 0.1f;
     hv_terminal.update_bus_current_margins();
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
@@ -290,7 +290,7 @@ void buck_stop_input_power_too_low()
 void buck_stop_high_voltage_emergency()
 {
     start_buck();
-    lv_terminal.bus->voltage = dcdc.ls_voltage_max + 0.1;
+    lv_terminal.bus->voltage = dcdc.ls_voltage_max + 0.1f;
     dcdc.control();
     TEST_ASSERT(half_bridge_enabled() == false);
 }
@@ -329,7 +329,7 @@ void boost_derating_output_voltage_too_high()
 {
     start_boost();
     float pwm_before = half_bridge_get_duty_cycle();
-    hv_terminal.bus->voltage = hv_terminal.bus->sink_voltage_intercept + 0.5;
+    hv_terminal.bus->voltage = hv_terminal.bus->sink_voltage_intercept + 0.5f;
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
     TEST_ASSERT(pwm_after > pwm_before); // higher duty cycle = less power
@@ -339,7 +339,7 @@ void boost_derating_output_current_too_high()
 {
     start_boost();
     float pwm_before = half_bridge_get_duty_cycle();
-    hv_terminal.current = hv_terminal.pos_current_limit + 0.1;
+    hv_terminal.current = hv_terminal.pos_current_limit + 0.1f;
     hv_terminal.update_bus_current_margins();
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
@@ -350,8 +350,8 @@ void boost_derating_input_voltage_too_low()
 {
     start_boost();
     float pwm_before = half_bridge_get_duty_cycle();
-    lv_terminal.bus->voltage = lv_terminal.bus->src_voltage_intercept - 0.1;
-    dcdc.power = -1.2;
+    lv_terminal.bus->voltage = lv_terminal.bus->src_voltage_intercept - 0.1f;
+    dcdc.power = -1.2f;
     hv_terminal.update_bus_current_margins();
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
@@ -363,7 +363,7 @@ void boost_derating_input_current_too_high()
 {
     start_boost();
     float pwm_before = half_bridge_get_duty_cycle();
-    dcdc.inductor_current = lv_terminal.neg_current_limit - 0.1;
+    dcdc.inductor_current = lv_terminal.neg_current_limit - 0.1f;
     dcdc.control();
     float pwm_after = half_bridge_get_duty_cycle();
     TEST_ASSERT(pwm_after > pwm_before);
@@ -390,7 +390,7 @@ void boost_stop_input_power_too_low()
 void boost_stop_high_voltage_emergency()
 {
     start_boost();
-    hv_terminal.bus->voltage = dcdc.hs_voltage_max + 0.1;
+    hv_terminal.bus->voltage = dcdc.hs_voltage_max + 0.1f;
     dcdc.control();
     TEST_ASSERT(half_bridge_enabled() == false);
 }

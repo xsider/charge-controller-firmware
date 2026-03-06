@@ -81,7 +81,7 @@ static void control_on_to_off_shedding()
     LoadOutput load_out(&bus, &load_drv_set, &load_drv_init, NULL);
     load_init(&load_out, true);
 
-    bus.voltage = load_out.disconnect_voltage - 0.1;
+    bus.voltage = load_out.disconnect_voltage - 0.1f;
     load_out.control();
     TEST_ASSERT_EQUAL(ERR_LOAD_SHEDDING, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_OFF, load_out.state);
@@ -93,7 +93,7 @@ void control_on_to_off_overvoltage()
     LoadOutput load_out(&bus, &load_drv_set, &load_drv_init, NULL);
     load_init(&load_out, true);
 
-    bus.voltage = bus.sink_voltage_intercept + 0.6;
+    bus.voltage = bus.sink_voltage_intercept + 0.6f;
 
     // increase debounce counter to 1 before limit
     for (int i = 0; i < CONFIG_CONTROL_FREQUENCY; i++) {
@@ -114,7 +114,7 @@ void control_on_to_off_overvoltage_dual_battery()
     LoadOutput load_out(&bus, &load_drv_set, &load_drv_init, NULL);
     load_init(&load_out, true, 2);
 
-    bus.voltage = (bus.sink_voltage_intercept + 0.6) * bus.series_multiplier;
+    bus.voltage = (bus.sink_voltage_intercept + 0.6f) * bus.series_multiplier;
 
     // increase debounce counter to 1 before limit
     for (int i = 0; i < CONFIG_CONTROL_FREQUENCY; i++) {
@@ -136,7 +136,7 @@ void control_on_to_off_overcurrent()
     load_init(&load_out, true);
 
     // current slightly below factor 2 so that it is not switched off immediately
-    load_out.current = DT_PROP(DT_CHILD(DT_PATH(outputs), load), current_max) * 1.9;
+    load_out.current = DT_PROP(DT_CHILD(DT_PATH(outputs), load), current_max) * 1.9f;
     load_out.control();
     TEST_ASSERT_EQUAL(LOAD_STATE_ON, load_out.state);
 
@@ -227,19 +227,19 @@ void control_off_overvoltage_to_on_at_lower_voltage()
     DcBus bus = {};
     LoadOutput load_out(&bus, &load_drv_set, &load_drv_init, NULL);
     load_init(&load_out);
-    bus.voltage = load_out.overvoltage + 0.1;
+    bus.voltage = load_out.overvoltage + 0.1f;
     load_out.error_flags = ERR_LOAD_OVERVOLTAGE;
 
     load_out.control();
     TEST_ASSERT_EQUAL(ERR_LOAD_OVERVOLTAGE, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_OFF, load_out.state);
 
-    bus.voltage = load_out.overvoltage - 0.1; // test hysteresis
+    bus.voltage = load_out.overvoltage - 0.1f; // test hysteresis
     load_out.control();
     TEST_ASSERT_EQUAL(ERR_LOAD_OVERVOLTAGE, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_OFF, load_out.state);
 
-    bus.voltage = load_out.overvoltage - load_out.ov_hysteresis - 0.1;
+    bus.voltage = load_out.overvoltage - load_out.ov_hysteresis - 0.1f;
     load_out.control();
     TEST_ASSERT_EQUAL(0, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_ON, load_out.state);
@@ -250,19 +250,19 @@ void control_off_overvoltage_to_on_at_lower_voltage_dual_battery()
     DcBus bus = {};
     LoadOutput load_out(&bus, &load_drv_set, &load_drv_init, NULL);
     load_init(&load_out, false, 2);
-    bus.voltage = (load_out.overvoltage + 0.1) * bus.series_multiplier;
+    bus.voltage = (load_out.overvoltage + 0.1f) * bus.series_multiplier;
     load_out.error_flags = ERR_LOAD_OVERVOLTAGE;
 
     load_out.control();
     TEST_ASSERT_EQUAL(ERR_LOAD_OVERVOLTAGE, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_OFF, load_out.state);
 
-    bus.voltage = (load_out.overvoltage - 0.1) * bus.series_multiplier; // test hysteresis
+    bus.voltage = (load_out.overvoltage - 0.1f) * bus.series_multiplier; // test hysteresis
     load_out.control();
     TEST_ASSERT_EQUAL(ERR_LOAD_OVERVOLTAGE, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_OFF, load_out.state);
 
-    bus.voltage = (load_out.overvoltage - load_out.ov_hysteresis - 0.1) * bus.series_multiplier;
+    bus.voltage = (load_out.overvoltage - load_out.ov_hysteresis - 0.1f) * bus.series_multiplier;
     load_out.control();
     TEST_ASSERT_EQUAL(0, load_out.error_flags);
     TEST_ASSERT_EQUAL(LOAD_STATE_ON, load_out.state);

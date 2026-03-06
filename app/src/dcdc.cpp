@@ -69,7 +69,7 @@ void Dcdc::perturb_observe_buck()
         power_good_timestamp = uptime();
     }
 
-    if ((uptime() - power_good_timestamp > 10 || power < -10.0) && mode != DCDC_MODE_AUTO) {
+    if ((uptime() - power_good_timestamp > 10 || power < -10.0f) && mode != DCDC_MODE_AUTO) {
         // switch off after 10s low power or negative power (if not in nanogrid mode)
         pwm_direction = 0;
     }
@@ -114,7 +114,7 @@ void Dcdc::perturb_observe_boost()
         power_good_timestamp = uptime();
     }
 
-    if ((uptime() - power_good_timestamp > 10 || -power < -10.0) && mode != DCDC_MODE_AUTO) {
+    if ((uptime() - power_good_timestamp > 10 || -power < -10.0f) && mode != DCDC_MODE_AUTO) {
         // switch off after 10s low power or negative power (if not in nanogrid mode)
         pwm_direction = 0;
     }
@@ -166,7 +166,7 @@ __weak DcdcOperationMode Dcdc::check_start_conditions()
 
     if (lvb->sink_current_margin > 0 && lvb->voltage < lvb->sink_control_voltage()
         && hvb->src_current_margin < 0 && hvb->voltage > hvb->src_control_voltage()
-        && hvb->voltage * 0.85 > lvb->voltage)
+        && hvb->voltage * 0.85f > lvb->voltage)
     {
         return DCDC_MODE_BUCK;
     }
@@ -259,7 +259,8 @@ __weak void Dcdc::control()
             half_bridge_start();
             power_good_timestamp = uptime();
             printf("DC/DC %s mode start (HV: %.2fV, LV: %.2fV, PWM: %.1f).\n", mode_name,
-                   hvb->voltage, lvb->voltage, half_bridge_get_duty_cycle() * 100);
+                   (double)hvb->voltage, (double)lvb->voltage,
+                   (double)half_bridge_get_duty_cycle() * 100.0);
         }
         else {
             startup_inhibit(true); // reset inhibit counter
@@ -275,7 +276,7 @@ __weak void Dcdc::control()
             stop_reason = "disabled";
         }
         else {
-            if (mode == DCDC_MODE_BUCK || (mode == DCDC_MODE_AUTO && inductor_current > 0.1)) {
+            if (mode == DCDC_MODE_BUCK || (mode == DCDC_MODE_AUTO && inductor_current > 0.1f)) {
                 perturb_observe_buck();
             }
             else {
@@ -289,9 +290,10 @@ __weak void Dcdc::control()
                 LOG_DBG("P %.2fW, inductor %.2fA, HS: %.2fV, %.2fA margin, "
                         "LS: %.2fV (target %.2fV), %.2fA margin, "
                         "PWM: %.1f, dcdc_state: %d, pwm_direction: %d",
-                        power, inductor_current, hvb->voltage, hvb->src_current_margin,
-                        lvb->voltage, lvb->sink_voltage_intercept, lvb->sink_current_margin,
-                        half_bridge_get_duty_cycle() * 100.0, state, pwm_direction);
+                        (double)power, (double)inductor_current, (double)hvb->voltage,
+                        (double)hvb->src_current_margin, (double)lvb->voltage,
+                        (double)lvb->sink_voltage_intercept, (double)lvb->sink_current_margin,
+                        (double)half_bridge_get_duty_cycle() * 100.0, state, pwm_direction);
             }
             else {
                 stop_reason = "low power";
@@ -316,7 +318,7 @@ void Dcdc::test()
             stop_reason = "disabled";
         }
         else {
-            if (half_bridge_get_duty_cycle() > 0.50) {
+            if (half_bridge_get_duty_cycle() > 0.50f) {
                 half_bridge_set_ccr(half_bridge_get_ccr() - 1);
             }
             else {
@@ -337,8 +339,9 @@ void Dcdc::test()
 
             half_bridge_set_duty_cycle(lvb->voltage / hvb->voltage);
             half_bridge_start();
-            printf("DC/DC test mode start (HV: %.2fV, LV: %.2fV, PWM: %.1f).\n", hvb->voltage,
-                   lvb->voltage, half_bridge_get_duty_cycle() * 100);
+            printf("DC/DC test mode start (HV: %.2fV, LV: %.2fV, PWM: %.1f).\n",
+                   (double)hvb->voltage, (double)lvb->voltage,
+                   (double)half_bridge_get_duty_cycle() * 100.0);
         }
         else {
             startup_inhibit(true); // reset inhibit counter
@@ -394,6 +397,7 @@ void Dcdc::output_hvs_disable()
 
 #else
 
-Dcdc::Dcdc(DcBus *high, DcBus *low, DcdcOperationMode op_mode) {}
+Dcdc::Dcdc(DcBus *high, DcBus *low, DcdcOperationMode op_mode)
+{}
 
 #endif /* BOARD_HAS_DCDC */

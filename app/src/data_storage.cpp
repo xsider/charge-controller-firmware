@@ -12,6 +12,7 @@
 #include "helper.h"
 #include "mcu.h"
 #include "thingset.h"
+#include "zephyr/toolchain.h"
 
 #include <stdio.h>
 
@@ -25,7 +26,7 @@ LOG_MODULE_REGISTER(nvs, CONFIG_DATA_STORAGE_LOG_LEVEL);
 K_MUTEX_DEFINE(data_buf_lock);
 
 // Buffer used by store and restore functions (must be word-aligned for hardware CRC calculation)
-static uint8_t buf[512] __aligned(sizeof(uint32_t));
+__maybe_unused static uint8_t buf[512] __aligned(sizeof(uint32_t));
 
 extern ThingSet ts;
 

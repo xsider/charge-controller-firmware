@@ -91,7 +91,8 @@ static inline float ntc_temp(uint32_t channel, int32_t vref, float ntc_series_re
     // resistance of NTC (Ohm)
     float rts = ntc_series_resistor * v_temp / (vref - v_temp);
 
-    return 1.0 / (1.0 / (273.15 + 25) + 1.0 / NTC_BETA_VALUE * log(rts / 10000.0)) - 273.15; // °C
+    return 1.0f / (1.0f / (273.15f + 25.0f) + 1.0f / (float)NTC_BETA_VALUE * logf(rts / 10000.0f))
+           - 273.15f; // °C
 }
 
 void calibrate_current_sensors()
@@ -369,13 +370,13 @@ void prepare_adc_readings(AdcValues values)
 {
     adc_readings[ADC_POS(vref_mcu)] = (uint16_t)(1.224 / 3.3 * 4096) << 4;
     adc_readings[ADC_POS(v_high)] =
-        (uint16_t)((values.solar_voltage / ADC_GAIN(v_high)) / 3.3 * 4096) << 4;
+        (uint16_t)((values.solar_voltage / ADC_GAIN(v_high)) / 3.3f * 4096) << 4;
     adc_readings[ADC_POS(v_low)] =
-        (uint16_t)((values.battery_voltage / ADC_GAIN(v_low)) / 3.3 * 4096) << 4;
+        (uint16_t)((values.battery_voltage / ADC_GAIN(v_low)) / 3.3f * 4096) << 4;
     adc_readings[ADC_POS(i_dcdc)] =
-        (uint16_t)((values.dcdc_current / ADC_GAIN(i_dcdc)) / 3.3 * 4096) << 4;
+        (uint16_t)((values.dcdc_current / ADC_GAIN(i_dcdc)) / 3.3f * 4096) << 4;
     adc_readings[ADC_POS(i_load)] =
-        (uint16_t)((values.load_current / ADC_GAIN(i_load)) / 3.3 * 4096) << 4;
+        (uint16_t)((values.load_current / ADC_GAIN(i_load)) / 3.3f * 4096) << 4;
 }
 
 void prepare_adc_filtered()

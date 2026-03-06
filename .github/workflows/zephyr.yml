@@ -1,45 +1,54 @@
-name: Build with Zephyr toolchain
+name: Build firmware
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
+    # Avoid running twice if pushing to a PR branch in the base repo
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest
-    container: zephyrprojectrtos/ci:latest
-    env:
-      CMAKE_PREFIX_PATH: /opt/toolchains
+    defaults:
+      run:
+        working-directory: firmware
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
-          path: charge-controller-firmware
-          fetch-depth: 0
+          path: firmware
+          fetch-depth: 0 # necessary to get tags
 
-      - name: Initialize
-        working-directory: charge-controller-firmware
-        run: |
-          west init -l .
-          west update --narrow
+      - name: Python setup
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.12
+
+      - name: Zephyr project setup
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: firmware
+          toolchains: arm-zephyr-eabi
 
       - name: Coding style check
-        working-directory: charge-controller-firmware
         run: |
-          apt-get update
-          apt-get install -y clang-format-12 colordiff
+          sudo apt-get update
+          sudo apt-get install -y clang-format-15 colordiff
           git status
           bash scripts/check-style.sh
 
       - name: Build firmware
-        working-directory: charge-controller-firmware
         run: |
-          cd app
-          west build -b mppt_2420_hc@0.2 -p
-          west build -b mppt_2420_lc -p
-          west build -b mppt_1210_hus@0.7 -p
-          west build -b pwm_2420_lus@0.3 -p
+          west build -b mppt_1210_hus app -p
+          west build -b mppt_2420_hc app -p
+          west build -b mppt_2420_hpx app -p
+          west build -b mppt_2420_lc app -p
+          west build -b mppt_2420_rc app -p
+          west build -b nucleo_g474re app -p
+          west build -b pwm_2420_lus app -p
 
-      - name: Run unit-tests
-        working-directory: charge-controller-firmware
+      - name: Run tests
         run: |
-          cd tests
-          west build -b native_posix -t run
+          west build -b native_sim -t run tests -p

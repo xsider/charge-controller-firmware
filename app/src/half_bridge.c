@@ -390,7 +390,7 @@ void half_bridge_init(int freq_kHz, int deadtime_ns, float min_duty, float max_d
 
 void half_bridge_set_duty_cycle(float duty)
 {
-    if (duty >= 0.0 && duty <= 1.0) {
+    if (duty >= 0.0f && duty <= 1.0f) {
         half_bridge_set_ccr(half_bridge_get_arr() * duty);
     }
 }

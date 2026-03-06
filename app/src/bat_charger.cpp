@@ -226,12 +226,12 @@ bool battery_conf_check(BatConf *bat_conf)
         { .func =
               [bat_conf]() {
                   return bat_conf->load_reconnect_voltage
-                         > (bat_conf->load_disconnect_voltage + 0.4);
+                         > (bat_conf->load_disconnect_voltage + 0.4f);
               },
           .text = "Load Reconnect Voltage must be higher than Load Disconnect Voltage + 0.4" },
         { .func =
               [bat_conf]() {
-                  return bat_conf->recharge_voltage < (bat_conf->topping_voltage - 0.4);
+                  return bat_conf->recharge_voltage < (bat_conf->topping_voltage - 0.4f);
               },
           .text = "Recharge Voltage must be lower than Topping Voltage - 0.4" },
         { .func =
@@ -241,28 +241,29 @@ bool battery_conf_check(BatConf *bat_conf)
           .text = "Recharge Voltage must be higher than Load Disconnect Voltage + 1.0" },
         { .func =
               [bat_conf]() {
-                  return bat_conf->load_disconnect_voltage > (bat_conf->absolute_min_voltage + 0.4);
+                  return bat_conf->load_disconnect_voltage
+                         > (bat_conf->absolute_min_voltage + 0.4f);
               },
           .text = "Load Disconnecct Voltage must be higher than Absolute Min Voltage + 0.4" },
         { .func =
               [bat_conf]() {
                   return bat_conf->internal_resistance
-                         < bat_conf->load_disconnect_voltage * 0.1 / DISCHARGE_CURRENT_MAX;
+                         < bat_conf->load_disconnect_voltage * 0.1f / DISCHARGE_CURRENT_MAX;
               },
           .text = "Internal Battery Resistance must not cause more than 10% drop at Max Discharge "
                   "Current" },
         { .func =
               [bat_conf]() {
                   return bat_conf->wire_resistance
-                         < bat_conf->topping_voltage * 0.03 / DISCHARGE_CURRENT_MAX;
+                         < bat_conf->topping_voltage * 0.03f / DISCHARGE_CURRENT_MAX;
               },
           .text = "Wire Resistances must not cause more than 3% drop at Max Discharge Current" },
         { .func =
               [bat_conf]() {
-                  return bat_conf->topping_cutoff_current < (bat_conf->nominal_capacity / 10.0);
+                  return bat_conf->topping_cutoff_current < (bat_conf->nominal_capacity / 10.0f);
               },
           .text = "Topping Cutoff Current must be less than 10% of Nominal Capacity (C/10)" },
-        { .func = [bat_conf]() { return bat_conf->topping_cutoff_current > 0.01; },
+        { .func = [bat_conf]() { return bat_conf->topping_cutoff_current > 0.01f; },
           .text = "Topping Cutoff Current must be higher than 0.01A" },
         { .func =
               [bat_conf]() {
@@ -355,10 +356,10 @@ void Charger::detect_num_batteries(BatConf *bat) const
         && port->bus->voltage < bat->absolute_max_voltage * 2)
     {
         port->bus->series_multiplier = 2;
-        printf("Detected two batteries (total %.2f V max)\n", bat->topping_voltage * 2);
+        printf("Detected two batteries (total %.2f V max)\n", (double)bat->topping_voltage * 2);
     }
     else {
-        printf("Detected single battery (%.2f V max)\n", bat->topping_voltage);
+        printf("Detected single battery (%.2f V max)\n", (double)bat->topping_voltage);
     }
 }
 
@@ -366,9 +367,9 @@ void Charger::update_soc(BatConf *bat_conf)
 {
     static int soc_filtered = 0; // SOC / 100 for better filtering
 
-    if (fabs(port->current) < 0.2) {
+    if (fabs(port->current) < 0.2f) {
         int soc_new = (int)((port->bus->voltage - bat_conf->ocv_empty)
-                            / (bat_conf->ocv_full - bat_conf->ocv_empty) * 10000.0);
+                            / (bat_conf->ocv_full - bat_conf->ocv_empty) * 10000.0f);
 
         if (soc_new > 500 && soc_filtered == 0) {
             // bypass filter during initialization
@@ -452,7 +453,8 @@ void Charger::discharge_control(BatConf *bat_conf)
         // discharging currently not allowed. should we allow it?
 
         if (port->bus->voltage
-            >= port->bus->src_control_voltage(bat_conf->absolute_min_voltage + 0.1F)) {
+            >= port->bus->src_control_voltage(bat_conf->absolute_min_voltage + 0.1F))
+        {
             dev_stat.clear_error(ERR_BAT_UNDERVOLTAGE);
         }
 
@@ -463,7 +465,8 @@ void Charger::discharge_control(BatConf *bat_conf)
         }
 
         if (!dev_stat.has_error(ERR_BAT_UNDERVOLTAGE | ERR_BAT_DIS_OVERTEMP
-                                | ERR_BAT_DIS_UNDERTEMP)) {
+                                | ERR_BAT_DIS_UNDERTEMP))
+        {
             // discharge current is stored as absolute value in bat_conf, but defined
             // as negative current for power port
             port->neg_current_limit = -bat_conf->discharge_current_max;

@@ -33,7 +33,11 @@ extern ThingSet ts;
 extern uint16_t can_node_addr;
 extern Charger charger;
 
+#if DT_NODE_EXISTS(DT_NODELABEL(can1))
 static const struct device *can_dev = DEVICE_DT_GET(DT_NODELABEL(can1));
+#elif DT_NODE_EXISTS(DT_NODELABEL(fdcan1))
+static const struct device *can_dev = DEVICE_DT_GET(DT_NODELABEL(fdcan1));
+#endif
 
 #ifdef CONFIG_ISOTP
 
@@ -46,15 +50,13 @@ const struct isotp_fc_opts fc_opts = {
 };
 
 struct isotp_msg_id rx_addr = {
-    .id_type = CAN_EXTENDED_IDENTIFIER,
-    .use_ext_addr = 0,   // Normal ISO-TP addressing (using only CAN ID)
-    .use_fixed_addr = 1, // enable SAE J1939 compatible addressing
+    // enable SAE J1939 compatible addressing
+    .flags = ISOTP_MSG_FIXED_ADDR | ISOTP_MSG_IDE,
 };
 
 struct isotp_msg_id tx_addr = {
-    .id_type = CAN_EXTENDED_IDENTIFIER,
-    .use_ext_addr = 0,   // Normal ISO-TP addressing (using only CAN ID)
-    .use_fixed_addr = 1, // enable SAE J1939 compatible addressing
+    // enable SAE J1939 compatible addressing
+    .flags = ISOTP_MSG_FIXED_ADDR | ISOTP_MSG_IDE,
 };
 
 static struct isotp_recv_ctx recv_ctx;
@@ -146,10 +148,8 @@ CAN_MSGQ_DEFINE(sub_msgq, 10);
 
 const struct can_filter ctrl_filter = {
     .id = TS_CAN_TYPE_PUBSUB,
-    .rtr = CAN_DATAFRAME,
-    .id_type = CAN_EXTENDED_IDENTIFIER,
-    .id_mask = TS_CAN_TYPE_MASK,
-    .rtr_mask = 1,
+    .mask = TS_CAN_TYPE_MASK,
+    .flags = CAN_FILTER_IDE,
 };
 
 void can_pub_isr(const struct device *dev, int error, void *user_data)
@@ -160,9 +160,8 @@ void can_pub_isr(const struct device *dev, int error, void *user_data)
 void can_pub_send(uint32_t can_id, uint8_t can_data[8], uint8_t data_len)
 {
     struct can_frame frame = { 0 };
-    frame.id_type = CAN_EXTENDED_IDENTIFIER;
-    frame.rtr = CAN_DATAFRAME;
     frame.id = can_id;
+    frame.flags = CAN_FRAME_IDE;
     memcpy(frame.data, can_data, 8);
 
     if (data_len >= 0) {

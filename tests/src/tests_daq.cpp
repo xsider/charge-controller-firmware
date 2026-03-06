@@ -100,7 +100,7 @@ void adc_alert_lv_undervoltage_triggering()
     adc_update_value(ADC_POS(v_low));
 
     // undervoltage test
-    adcval.battery_voltage = bat_conf.absolute_min_voltage - 0.1;
+    adcval.battery_voltage = bat_conf.absolute_min_voltage - 0.1f;
     prepare_adc_readings(adcval);
     adc_update_value(ADC_POS(v_low));
     TEST_ASSERT_EQUAL(false, dev_stat.has_error(ERR_LOAD_VOLTAGE_DIP));
@@ -130,7 +130,7 @@ void adc_alert_lv_overvoltage_triggering()
     dcdc.state = DCDC_CONTROL_MPPT;
 
     // overvoltage test
-    adcval.battery_voltage = bat_conf.absolute_max_voltage + 0.1;
+    adcval.battery_voltage = bat_conf.absolute_max_voltage + 0.1f;
     prepare_adc_readings(adcval);
     adc_update_value(ADC_POS(v_low));
     TEST_ASSERT_EQUAL(false, dev_stat.has_error(ERR_BAT_OVERVOLTAGE));

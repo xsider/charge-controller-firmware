@@ -68,7 +68,7 @@ int main(void)
 #endif
 
 #if BOARD_HAS_USB_OUTPUT
-    usb_pwr.set_voltage_limits(bat_conf.load_disconnect_voltage - 0.1, // keep on longer than load
+    usb_pwr.set_voltage_limits(bat_conf.load_disconnect_voltage - 0.1f, // keep on longer than load
                                bat_conf.load_reconnect_voltage, bat_conf.absolute_max_voltage);
 #endif
 

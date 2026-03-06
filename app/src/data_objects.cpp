@@ -1175,7 +1175,9 @@ void data_objects_init()
     hwinfo_get_device_id(buf, sizeof(buf));
 
     uint64_t id64 = crc32_ieee(buf, sizeof(buf));
+#ifdef CONFIG_LIBRE_SOLAR_TYPE_ID
     id64 += ((uint64_t)CONFIG_LIBRE_SOLAR_TYPE_ID) << 32;
+#endif
 
     uint64_to_base32(id64, device_id, sizeof(device_id), alphabet_crockford);
 #endif
