@@ -1,5 +1,6 @@
 board:
   name: pwm_2420_lus
+  full_name: Libre Solar PWM 2420 LUS
   vendor: libresolar
   socs:
     - name: stm32l072xx

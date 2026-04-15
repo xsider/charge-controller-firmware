@@ -1,5 +1,6 @@
 board:
   name: mppt_2420_hpx
+  full_name: Libre Solar MPPT 2420 HPX
   vendor: libresolar
   socs:
     - name: stm32g431xx

@@ -11,7 +11,7 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyrproject
-      revision: v4.3-branch
+      revision: v4.4-branch
       import:
         name-allowlist:
           - cmsis_6
@@ -24,7 +24,7 @@ manifest:
       path: modules/oled-display
     - name: thingset-zephyr-sdk
       remote: thingset
-      revision: 5d5c6b031ba543d67a3dc6904ccfc987ebdadc52
+      revision: 8b32f7db1898dc51daa1834b3f8058de6a67166f
       path: thingset-zephyr-sdk
       import:
         name-allowlist:

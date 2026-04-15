@@ -1,5 +1,6 @@
 board:
   name: mppt_1210_hus
+  full_name: Libre Solar MPPT 1210 HUS
   vendor: libresolar
   socs:
     - name: stm32l072xx

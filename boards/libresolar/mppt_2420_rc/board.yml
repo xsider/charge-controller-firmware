@@ -1,5 +1,6 @@
 board:
   name: mppt_2420_rc
+  full_name: Libre Solar MPPT 2420 RC
   vendor: libresolar
   socs:
     - name: stm32f072xb
