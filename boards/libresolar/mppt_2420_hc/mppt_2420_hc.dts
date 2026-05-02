@@ -122,17 +122,22 @@
 	};
 };
 
-&clk_hsi {
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(8)>;
+	status = "okay";
+};
+
+&clk_hsi48 {
 	status = "okay";
 };
 
 &pll {
-	div-m = <4>;
+	div-m = <2>;
 	mul-n = <75>;
 	div-p = <7>;
 	div-q = <2>;
 	div-r = <2>;
-	clocks = <&clk_hsi>;
+	clocks = <&clk_hse>;
 	status = "okay";
 };
 
@@ -145,6 +150,8 @@
 };
 
 &rng {
+	clocks = <&rcc STM32_CLOCK(AHB2, 26)>,
+		 <&rcc STM32_SRC_HSI48 CLK48_SEL(0)>;
 	status = "okay";
 };
 
@@ -219,6 +226,8 @@
 };
 
 &fdcan1 {
+	clocks = <&rcc STM32_CLOCK(APB1, 25)>,
+		 <&rcc STM32_SRC_PLL_Q FDCAN_SEL(1)>;
 	pinctrl-0 = <&fdcan1_rx_pa11 &fdcan1_tx_pa12>;
 	pinctrl-names = "default";
 	bitrate = <500000>;
